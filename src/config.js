@@ -14,4 +14,4 @@ export const COLS = 30;
 export const INITIAL_DELAY = 3000;
 
 // 1초 마다 주기에 곱해줄 상수 (0.95로 지정하면 적당)
-export const DELAY_EXPONENT = 1;
+export const DELAY_EXPONENT = 0.95;

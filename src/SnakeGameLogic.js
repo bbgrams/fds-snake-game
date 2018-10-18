@@ -6,100 +6,78 @@ import {ROWS, COLS} from './config';
 function SnakeGameLogic() {
   // 각 마디의 좌표를 저장하는 배열
   this.joints = [
-    { x: 7, y: 1 },
-    { x: 6, y: 1 },
-    { x: 5, y: 1 },
-    { x: 4, y: 1 },
+    { x: 2, y: 0 },
+    { x: 1, y: 0 },
+    { x: 0, y: 0 },
   ];
-  this.currentKey = 1;
 
   // 먹이의 좌표
   this.fruit = {x: 3, y: 5};
-}
-SnakeGameLogic.prototype.circle = function(x, y){
-  for ( let i = 1; i < this.joints.length; i++){
-    if ( this.joints[i].x === this.joints[0].x && this.joints[i].y === this.joints[0].y){
-      return true;
-    }
-  }
-  return false;
-}
-
-SnakeGameLogic.prototype.eat = function(){
-  if ( this.joints[0].x === this.fruit.x && this.joints[0].y === this.fruit.y){
-    return true;
-    return false;
-  }
-}
-
-SnakeGameLogic.prototype.setFruit = function(){
-  this.fruit.x = Math.floor(Math.random() * COLS );
-  this.fruit.y = Math.floor(Math.random() * ROWS );
-  if ( this.joints.some(item => item.x === this.fruit.x) &&
-       this.joints.some(item => item.y === this.fruit.y)){
-         this.setFruit();
-       }
+  this.direction = 'right';
 }
 
 SnakeGameLogic.prototype.up = function() {
   // 위쪽 화살표 키를 누르면 실행되는 함수
-  this.currentKey = 0;
+  this.direction = 'up';
 }
 
 SnakeGameLogic.prototype.down = function() {
   // 아래쪽 화살표 키를 누르면 실행되는 함수
-  console.log('down');
-  // 배열안의 객체안의 숫자를 변경하고싶다.
-  this.currentKey = 2;
+  this.direction = 'down';
 }
 
 SnakeGameLogic.prototype.left = function() {
   // 왼쪽 화살표 키를 누르면 실행되는 함수
-  this.currentKey = 3;
+  this.direction = 'left';
 }
 
 SnakeGameLogic.prototype.right = function() {
   // 오른쪽 화살표 키를 누르면 실행되는 함수
-  this.currentKey = 1;
+  this.direction = 'right';
+
 }
 
 SnakeGameLogic.prototype.nextState = function() {
   // 한 번 움직여야 할 타이밍마다 실행되는 함수
   // 게임이 아직 끝나지 않았으면 `true`를 반환
   // 게임이 끝났으면 `false`를 반환
-  // console.log(`nextState`);
-  let tail;
-
-  if(this.eat()){
-    tail = this.joints.slice();
-    this.setFruit();
+  console.log(`nextState`);
+  let newHead = this.joints
+  // 'nextState'가 출력될때마다 움직인다.
+  if (this.direction === 'up'){
+    newHead.unshift({
+      x : newHead[0].x,
+      y : newHead[0].y - 1
+    })
+  } else if (this.direction === 'right') {
+    newHead.unshift({
+      x: newHead[0].x + 1,
+      y: newHead[0].y
+    })
+  } else if(this.direction === 'down'){
+    newHead.unshift({
+      x: newHead[0].x,
+      y: newHead[0].y + 1
+    })
+  } else if (this.direction === 'left') {
+    newHead.unshift({
+      x: newHead[0].x - 1,
+      y: newHead[0].y
+    })
+  }
+  
+  // 먹이를 먹지 않았을 때는 꼬리가 떼지고 머리에 붙고,
+  // 먹이를 먹었을 때는 꼬리가 떼지지 않고 머리가 붙는다.
+  //                   랜덤한 위치에 먹이가 다시 생긴다.
+  if ( newHead[0].x !== this.fruit.x || newHead[0].y !== this.fruit.y){
+    newHead.pop()
   }else{
-    tail = this.joints.pop();
+    this.fruit.x = Math.floor(Math.random() * COLS)
+    this.fruit.y = Math.floor(Math.random() * ROWS)
   }
 
-  tail.x = this.joints[0].x;
-  tail.y = this.joints[0].y;
 
-  if ( this.currentKey === 0){
-    tail.y--;
-  }else if ( this.currentKey === 1){
-    tail.x++;
-  }else if ( this.currentKey === 2){
-    tail.y++;
-  }else if( this.currentKey === 3){
-    tail.x--;
-  }
-  this.joints.unshift(tail);
-
-  if( this.joints[0].x < 0 || this.joints[0].x >= COLS ||
-      this.joints[0].y < 0 || this.joints[0].y >= ROWS){
-        return false
-  }
-
-  if( this.circle()){
-    return false
-  }
-
+  
 
   return true;
   
